@@ -1,0 +1,85 @@
+---
+title: "Analysis on the World Happiness Scores with Multiple Linear Regression Model"
+author: "Wing Yi Ma"
+date: "12/1/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(rsq)
+library(knitr)
+library(survey)
+library(tidyverse)
+happiness_dat <- read_csv("WHR2020.csv")
+```
+# GitHub repo
+Code and data supporting this analysis is available at: https://github.com/mawymaggie/STA304FinalProject.git 
+
+# Abstract
+##### a brief summary of the entire report (one paragraph)
+# Keywords
+World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical Analysis, Relationships, Survey, Instrumental Variable, Treatment, Estimation
+
+
+# Introduction
+  How happy are people around the world? The World Happiness Report (WHR) ranks countries according to the happiness scores their citizens give to themselves. This happiness score is a subjective score on how happy each individual perceives themselves to be, and is collected through a survey called the Gallup World Poll (Helliwell, 2020). This report seems to show that how happy a person is could be dependent on some environmental and social factors that vary from country to country.
+
+  So, what are the factors that determine the level of happiness of the citizens of a country? In this report, a multiple linear regression model will be performed on the 2020 World Happiness Report dataset to predict Happiness Scores with various explanatory variables. A multiple linear regression model (MLR) is a statistical technique that is used to investigate linear relationships between a numerical outcome variable and multiple predictor variables. It models the relationship by using the predictor variables to estimate the values of the outcome variable (Kenton, 2020). Therefore with MLR, a statistical analysis can be done to find out how those factors included in the model, such as the GDP per capita, healthy life expectancy, affect the happiness score of a country. ########### (how to use the results in real practice) - identify which countries have more ideal living environment(?), help governments/organizations to improve the quality of lives(?), 
+
+  In the following sections, a thorough analysis will be performed to examine the relationships between Happiness Score and some potential factors that affect it. In the Methodology section (Section 2), the 2020 World Happiness Report dataset is first introduced, followed by the details of the multiple linear regression model and the additional approach of an instrumental variable to look into the indirect effect of this extra variable on Happiness Scores. The results of the above methodology can then be found in the Results Section (Section 3). Last but not least, the Conclusion Section (Section 4) covers the explanations and implications of the results, and the report finishes with a Reference Section (Section 5) including the references of the sources used in the report.
+
+
+# Methodology
+### Data
+###### describe the data (table 1 - a table providing baseline characteristics of the data = histogram of each variable)
+### Model
+
+# Results
+
+# Discussion
+### Summary
+
+### Conclusions
+
+### Weakness & Next Steps
+
+# References
+### DataSet
+Helliwell, John F., Richard Layard, Jeffrey Sachs, and Jan-Emmanuel De Neve, eds. 2020.
+  World Happiness Report 2020. New York: Sustainable Development Solutions Network
+### Packages
+
+### Software 
+RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC,
+  Boston, MA URL http://www.rstudio.com/.
+### Websites
+Kenton, W. (2020, September 21). How Multiple Linear Regression Works. Retrieved December 02, 2020, 
+  from  https://www.investopedia.com/terms/m/mlr.asp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
