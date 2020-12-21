@@ -15,13 +15,34 @@ library(rsq)
 library(knitr)
 library(survey)
 library(tidyverse)
-happiness_dat <- read_csv("WHR2020.csv")
+library(ggpubr)
+```
+
+```{r, include=FALSE}
+# cleaning
+happiness_raw <- read_csv("WHR2020.csv")
+happiness_dat <- happiness_raw %>% 
+  select(`Ladder score`,
+         `Logged GDP per capita`,
+         `Social support`,
+         `Healthy life expectancy`,
+         `Freedom to make life choices`,
+         `Perceptions of corruption`,
+         `Regional indicator`,
+         Generosity)
+happiness_dat <- happiness_dat %>%
+  rename(
+    `Happiness Score` = `Ladder score`,
+    `GDP per capita` = `Logged GDP per capita`,
+    Region = `Regional indicator`
+  )
 ```
 # GitHub repo
 Code and data supporting this analysis is available at: https://github.com/mawymaggie/STA304FinalProject.git 
 
 # Abstract
 ##### a brief summary of the entire report (one paragraph)
+
 # Keywords
 World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical Analysis, Relationships, Survey, Instrumental Variable, Treatment, Estimation
 
@@ -29,34 +50,119 @@ World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical
 # Introduction
   How happy are people around the world? The World Happiness Report (WHR) ranks countries according to the happiness scores their citizens give to themselves. This happiness score is a subjective score on how happy each individual perceives themselves to be, and is collected through a survey called the Gallup World Poll (Helliwell, 2020). This report seems to show that how happy a person is could be dependent on some environmental and social factors that vary from country to country.
 
-  So, what are the factors that determine the level of happiness of the citizens of a country? In this report, a multiple linear regression model will be performed on the 2020 World Happiness Report dataset to predict Happiness Scores with various explanatory variables. A multiple linear regression model (MLR) is a statistical technique that is used to investigate linear relationships between a numerical outcome variable and multiple predictor variables. It models the relationship by using the predictor variables to estimate the values of the outcome variable (Kenton, 2020). Therefore with MLR, a statistical analysis can be done to find out how those factors included in the model, such as the GDP per capita, healthy life expectancy, affect the happiness score of a country. ########### (how to use the results in real practice) - identify which countries have more ideal living environment(?), help governments/organizations to improve the quality of lives(?), 
+  So, what are the factors that determine the level of happiness of the citizens of a country? In this report, a multiple linear regression model will be performed on the 2020 World Happiness Report dataset to predict Happiness Scores with various explanatory variables. A multiple linear regression model (MLR) is a statistical technique that is used to investigate linear relationships between a numerical outcome variable and multiple predictor variables. It models the relationship by using the predictor variables to estimate the values of the outcome variable (Kenton, 2020). Therefore with MLR, a statistical analysis can be done to find out how those factors included in the model, such as the GDP per capita, healthy life expectancy, affect the happiness score of a country. Then by considering these findings of the analysis, we can identify the qualities of a more ideal living environment and hence, changes can possibly be made to create a "Happier" world.
 
   In the following sections, a thorough analysis will be performed to examine the relationships between Happiness Score and some potential factors that affect it. In the Methodology section (Section 2), the 2020 World Happiness Report dataset is first introduced, followed by the details of the multiple linear regression model and the additional approach of an instrumental variable to look into the indirect effect of this extra variable on Happiness Scores. The results of the above methodology can then be found in the Results Section (Section 3). Last but not least, the Conclusion Section (Section 4) covers the explanations and implications of the results, and the report finishes with a Reference Section (Section 5) including the references of the sources used in the report.
 
 
 # Methodology
 ### Data
-###### describe the data (table 1 - a table providing baseline characteristics of the data = histogram of each variable)
+[describe the data (table 1 - a table providing baseline characteristics of the data = histogram of each variable)]
+
+* Here is a table of the first few rows of the Happiness Dataset:
+```{r, echo = FALSE}
+kable(head(happiness_dat), caption = "Table 1 - Example of the Happiness Dataset", digits = 2)
+```
+
+*Happiness Score*: the score individuals gave to themselves indicating how happy they think they are. 
+
+*GDP per Capita*: the GDP of each of the country. 
+
+* The following graphs display the distributions of the *Happiness Score* and the explanatory variables in the Happiness Dataset:
+
+```{r, echo = FALSE}
+
+g1<-happiness_dat %>%
+  ggplot(aes(x= `Happiness Score`)) +
+  geom_density() +
+  labs(title = "Happiness Score",
+       caption = "Figure 1 - Density Graph of Happiness Score",
+       x = "Happiness Score")
+
+g2<-happiness_dat %>%
+  ggplot(aes(x= `GDP per capita`)) +
+  geom_density() +
+  labs(title = "GDP per capita",
+       caption = "Figure 2 - Density Graph of GDP per capita",
+       x = "GDP per capita")
+
+g3<-happiness_dat %>%
+  ggplot(aes(x= `Social support`)) +
+  geom_density() +
+  labs(title = "Social support",
+       caption = "Figure 3 - Density Graph of Social support",
+       x = "Social support")
+
+g4<-happiness_dat %>%
+  ggplot(aes(x= `Healthy life expectancy`)) +
+  geom_density() +
+  labs(title = "Healthy life expectancy",
+       caption = "Figure 4 - Density Graph of Healthy life expectancy",
+       x = "Healthy life expectancy")
+
+g5<-happiness_dat %>%
+  ggplot(aes(x= `Freedom to make life choices`)) +
+  geom_density() +
+  labs(title = "Freedom to make life choices",
+       caption = "Figure 5 - Density Graph of Freedom to make life choices",
+       x = "Freedom to make life choices")
+
+g6<-happiness_dat %>%
+  ggplot(aes(x= `Perceptions of corruption`)) +
+  geom_density() +
+  labs(title = "Perceptions of corruption",
+       caption = "Figure 6 - Density Graph of Perceptions of corruption",
+       x = "Perceptions of corruption")
+
+g7<-table(happiness_dat$Region)
+g8<-happiness_dat %>%
+  ggplot(aes(x= Generosity)) +
+  geom_density() +
+  labs(title = "Generosity",
+       caption = "Figure 7 - Density Graph of Generosity",
+       x = "Generosity")
+
+ggarrange(g1, g2, g3, g4, ncol = 2, nrow = 2)
+ggarrange(g5, g6, g8, ncol = 2, nrow = 2)
+
+kable(arrange(as.data.frame(g7), desc(Freq)),col.names = c("Region", "Count"), caption = "Table 2 - Distribution of Region")
+
+```
+
 ### Model
+[write out the model and describe the parameters and variables included + justification for why this model was selected.]
+[include mathematical notation when explicitly stating the model, should describe the notation used]
+
 
 # Results
+[relay any tables and graphs that are a result of some intended statistical analysis, should include text describing the results of these tables and figures.]
+[additional analysis results should be included here]
+[be concise]
+[should say: we estimate that the ... to be (number). this is based off our ... analysis of ... modelled by a <type of model>, which accounted for <list of variables in the model>.]
 
 # Discussion
 ### Summary
+[tie everything together ~ 1 paragraph]
 
 ### Conclusions
+[explain the results and identify any relevant findings - touch on global impacts ~ 2 paragraphs]
+[ex) The propensity score analysis showed that people who smoked were 2.465 (p-value = 0.002) times more likely to develop lung cancer than people who did not smoke. Based off this result it appears as though smoking at least 1 pack of cigarettes per day for a prolonged period of time will increase one’s likelihood of developing lung cancer by approximately 250%.]
 
 ### Weakness & Next Steps
+[address weakness of the analysis]
+[address future steps of the analysis - how to improve it (can refer to weaknesses)]
 
 # References
 ### DataSet
 Helliwell, John F., Richard Layard, Jeffrey Sachs, and Jan-Emmanuel De Neve, eds. 2020.
   World Happiness Report 2020. New York: Sustainable Development Solutions Network
+  
 ### Packages
 
 ### Software 
 RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC,
   Boston, MA URL http://www.rstudio.com/.
+  
 ### Websites
 Kenton, W. (2020, September 21). How Multiple Linear Regression Works. Retrieved December 02, 2020, 
   from  https://www.investopedia.com/terms/m/mlr.asp
