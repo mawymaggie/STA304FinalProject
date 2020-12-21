@@ -56,17 +56,34 @@ World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical
 
 
 # Methodology
-### Data
-[describe the data (table 1 - a table providing baseline characteristics of the data = histogram of each variable)]
+## Data
+
+  This report relies on the 2020 World Happiness Report (WHR) dataset. The WHR is an annual report started in 2012 that ranks countries according to how happy their citizens perceive themselves to be in order to “review the science of measuring and understanding subjective well-being, and to use survey measures of life satisfaction to track the quality of lives” (Helliwell, 2020).
 
 * Here is a table of the first few rows of the Happiness Dataset:
 ```{r, echo = FALSE}
-kable(head(happiness_dat), caption = "Table 1 - Example of the Happiness Dataset", digits = 2)
+kable(head(happiness_dat), caption = "Example of the Happiness Dataset", digits = 2)
 ```
 
-*Happiness Score*: the score individuals gave to themselves indicating how happy they think they are. 
+  There are 153 observations representing the 153 countries and 20 columns in the dataset, but only the following 8 columns are necessary to be considered in the analysis of this report:
 
-*GDP per Capita*: the GDP of each of the country. 
+1. _**Happiness Score**_: the average score individuals of the corresponding country gave to themselves indicating how happy they think they are. 
+
+2. _**GDP per Capita**_: the GDP of each of the countries. 
+
+3. _**Social Support**_: national average value of binary responses of 0 = No and 1 = Yes to the question asking whether the respondent has relatives or friends they can count on to help them with their needs.
+
+4. _**Healthy life  expectancy**_: national average of age indicating the healthy life expectancy determined at birth.
+
+5. _**Freedom to make life choices**_: national average of binary responses to the question asking whether the respondent is satisfied with their freedom to make life choices.
+
+6. _**Perceptions of corruption**_: national average of binary responses to two questions asking whether the respondent thinks corruption is widespread throughout the government and within businesses or not, with responses on business corruption being the main measure. 
+
+7. _**Region**_: the corresponding region of the country
+
+8. _**Generosity**_: the residual of regressing the national average of responses to the question asking whether the respondent had donated money to a charity in the past month on *GDP per capita*. 
+
+  Some of the data is collected from the survey responses in the Gallup World Poll, which includes the *Happiness Score*,  *Social Support*, *Freedom to make life choices*, *Perceptions of corruption*, *Region*, and *Generosity*. The other parts of the data come from different government organizations according to the region the surveyed individual is from. *GDP per capita* is obtained from the World Development Indicators released by the World Bank.  
 
 * The following graphs display the distributions of the *Happiness Score* and the explanatory variables in the Happiness Dataset:
 
@@ -125,11 +142,13 @@ g8<-happiness_dat %>%
 ggarrange(g1, g2, g3, g4, ncol = 2, nrow = 2)
 ggarrange(g5, g6, g8, ncol = 2, nrow = 2)
 
-kable(arrange(as.data.frame(g7), desc(Freq)),col.names = c("Region", "Count"), caption = "Table 2 - Distribution of Region")
+kable(arrange(as.data.frame(g7), desc(Freq)),col.names = c("Region", "Count"), caption = "Distribution of Region")
 
 ```
 
-### Model
+  This dataset is selected because of its recentness and the fact that the happiness score is based on the individual respondent's judgment on their own level of happiness, making the data more meaningful in terms of our purpose as we are curious about factors that affect the happiness of individuals. As well, the dataset takes into account 153 countries that vary largely in the variables included in the report, which can potentially provide clearer relationships between the variables. 
+
+## Model
 [write out the model and describe the parameters and variables included + justification for why this model was selected.]
 [include mathematical notation when explicitly stating the model, should describe the notation used]
 
@@ -144,26 +163,26 @@ kable(arrange(as.data.frame(g7), desc(Freq)),col.names = c("Region", "Count"), c
 ### Summary
 [tie everything together ~ 1 paragraph]
 
-### Conclusions
+## Conclusions
 [explain the results and identify any relevant findings - touch on global impacts ~ 2 paragraphs]
 [ex) The propensity score analysis showed that people who smoked were 2.465 (p-value = 0.002) times more likely to develop lung cancer than people who did not smoke. Based off this result it appears as though smoking at least 1 pack of cigarettes per day for a prolonged period of time will increase one’s likelihood of developing lung cancer by approximately 250%.]
 
-### Weakness & Next Steps
+## Weakness & Next Steps
 [address weakness of the analysis]
 [address future steps of the analysis - how to improve it (can refer to weaknesses)]
 
 # References
-### DataSet
+## DataSet
 Helliwell, John F., Richard Layard, Jeffrey Sachs, and Jan-Emmanuel De Neve, eds. 2020.
   World Happiness Report 2020. New York: Sustainable Development Solutions Network
   
-### Packages
+## Packages
 
-### Software 
+## Software 
 RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC,
   Boston, MA URL http://www.rstudio.com/.
   
-### Websites
+## Websites
 Kenton, W. (2020, September 21). How Multiple Linear Regression Works. Retrieved December 02, 2020, 
   from  https://www.investopedia.com/terms/m/mlr.asp
 
