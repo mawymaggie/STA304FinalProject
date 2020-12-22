@@ -16,6 +16,7 @@ library(knitr)
 library(survey)
 library(tidyverse)
 library(ggpubr)
+library(estimatr)
 ```
 
 ```{r, include=FALSE}
@@ -32,7 +33,8 @@ happiness_dat <- happiness_dat %>%
   rename(
     `Happiness Score` = `Ladder score`,
     `GDP per capita` = `Logged GDP per capita`,
-    Region = `Regional indicator`
+    Region = `Regional indicator`,
+    `Generosity` = Generosity
   )
 ```
 # GitHub repo
@@ -40,14 +42,14 @@ Code and data supporting this analysis is available at: https://github.com/mawym
 
 # Abstract
 
-Our world is made up of over 7 billions unique individuals. One of the most unique components of us is our feelings, and they are determined by our surroundings. This report aims to investigate the impacts of several social factors on the *Happiness* of individuals using data obtained from the 2020 World Happiness Report. A statistical analysis using a Multiple Linear Regression Model is performed on the dataset to achieve the goal of the investigation. Evidence on positive impacts of *GDP per capita*, *Social Support*, and *Freedom to Make Life Choices* on the average *Happiness Score* individuals in each participating country give to themselves..........
+Our world is made up of over 7 billions unique individuals. One of the most unique components of us is our feelings, and they are determined by our surroundings. This report aims to investigate the impacts of several social factors on the *Happiness* of individuals using data obtained from the 2020 World Happiness Report. A statistical analysis using a Multiple Linear Regression Model is performed on the dataset to achieve the goal of our investigation. Evidences on positive impacts of *GDP per capita*, *Social Support*, and *Freedom to Make Life Choices* on the average *Happiness Score* individuals in each participating country give to themselves were found. *Generosity* also appears to have an indirect negative relationship with *Happiness Score* through *Social Support*.
 
 # Keywords
-World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical Analysis, Relationships, Survey, Instrumental Variable, Treatment, Estimation
+World Happiness Report, Happiness Score, Happiness, Social Factors, Multiple Linear Regression, Statistical Analysis, Relationships, Survey, Instrumental Variable, Treatment, Estimation
 
 
 # Introduction
-  How happy are people around the world? The World Happiness Report (WHR) ranks countries according to the happiness scores their citizens give to themselves. This happiness score is a subjective score on how happy each individual perceives themselves to be, and is collected through a survey called the Gallup World Poll (Helliwell, 2020). This report seems to show that how happy a person is could be dependent on some environmental and social factors that vary from country to country.
+  How happy are people around the world? The World Happiness Report (WHR) ranks countries according to the happiness scores their citizens give to themselves. This happiness score is a subjective score on how happy each individual perceives themselves to be, and is collected through a survey called the Gallup World Poll (Helliwell, 2020). This report seems to show that how happy a person is could be dependent on some social factors that vary from country to country.
 
   So, what are the factors that determine the level of happiness of the citizens of a country? In this report, a multiple linear regression model will be performed on the 2020 World Happiness Report dataset to predict Happiness Scores with various explanatory variables. A multiple linear regression model (MLR) is a statistical technique that is used to investigate linear relationships between a numerical outcome variable and multiple predictor variables. It models the relationship by using the predictor variables to estimate the values of the outcome variable (Kenton, 2020). Therefore with MLR, a statistical analysis can be done to find out how those factors included in the model, such as the GDP per capita and social support, affect the happiness score of a country. Then by considering these findings of the analysis, we can identify the qualities of a more ideal living environment and hence, changes can possibly be made to create a "Happier" world.
 
@@ -79,9 +81,9 @@ kable(head(happiness_dat), caption = "Example of the Happiness Dataset", digits 
 
 6. _**Generosity**_: the residual of regressing the national average of responses to the question asking whether the respondent had donated money to a charity in the past month on *GDP per capita*. 
 
-  While *GDP per capita* is then obtained from the World Development Indicators released by the World Bank, the rest of the data is collected from the survey responses in the Gallup World Poll (*Happiness Score*,  *Social Support*, *Freedom to make life choices*, *Region*, and *Generosity*). The Gallup World Poll is a survey targeting the entire world population that covers a huge variety of topics. There are 160 countries and areas around the world included in their sample. The target population of the survey is the entire civilian, non-institutionalized, aged 15 and older population of the world (Gallup 2020). Gallup conducts the survey either by landline and cellular telephones in countries where telephone coverage represents at least 80% of the population and in the other countries, face-to-face interviews are used. Telephone interviews use either the nationally representative life of phone numbers or a computer system that generates random phone numbers with specified area codes. This means that the sample is selected through a stratified method that creates a frame population of all possible phone numbers with or without an owner for telephone interview sample; the frame of the face-to-face interviews is the area frame that is defined with land units. Then a sample of each country is selected randomly from the sampling frame with a size of around 500 to 2000 respondents. Those selected respondents of each of the 153 countries are then added together to make up the sampled population of the entire survey.  
+  While *GDP per capita* is then obtained from the World Development Indicators released by the World Bank, the rest of the data is collected from the survey responses in the Gallup World Poll (*Happiness Score*,  *Social Support*, *Freedom to make life choices*, *Region*, and *Generosity*). The Gallup World Poll is a survey targeting the entire world population that covers a huge variety of topics. There are 160 countries and areas around the world included in their sample. The target population of the survey is the entire civilian, non-institutionalized, aged 15 and older population of the world (Gallup 2020). Gallup conducts the survey either by landline and cellular telephones in countries where telephone coverage represents at least 80% of the population and in the other countries, face-to-face interviews are performed. Telephone interviews use either the nationally representative life of phone numbers or a computer system that generates random phone numbers with specified area codes. This means that the sample is selected through a stratified method that creates a frame population of all possible phone numbers with or without an owner for telephone interview sample; the frame of the face-to-face interviews is the area frame that is defined with land units. Then a sample of each country is selected randomly from the sampling frame with a size ranging from 500 to 2000 respondents depending on the countries. Those selected respondents of each of the 153 countries are then added together to make up the sampled population of the entire survey.  
 
-* The following graphs display the distributions of the *Happiness Score* and the explanatory variables in the Happiness Dataset:
+* The following graphs display the distributions of the *Happiness Score* and the meaningful variables in the Happiness Dataset:
 
 ```{r, echo = FALSE}
 
@@ -110,14 +112,14 @@ g4<-happiness_dat %>%
   ggplot(aes(x= `Freedom to make life choices`)) +
   geom_density() +
   labs(title = "Freedom to make life choices",
-       caption = "Figure 5 - Density Graph of Freedom to make life choices",
+       caption = "Figure 4 - Density Graph of Freedom to make life choices",
        x = "Freedom to make life choices")
 
 g5<-happiness_dat %>%
   ggplot(aes(x= Generosity)) +
   geom_density() +
   labs(title = "Generosity",
-       caption = "Figure 7 - Density Graph of Generosity",
+       caption = "Figure 5 - Density Graph of Generosity",
        x = "Generosity")
 g6<-table(happiness_dat$Region)
 
@@ -127,49 +129,193 @@ kable(arrange(as.data.frame(g6), desc(Freq)),col.names = c("Region", "Count"), c
 
 ```
 
-  This dataset is selected because of its recentness and the fact that the happiness score is based on the individual respondent's judgment on their own feeling of happiness, making the data more meaningful in terms of our purpose as we are curious about factors that affect the happiness of individuals. As well, the dataset takes into account 153 countries that vary largely in the variables included in the report, which can potentially provide clearer relationships between the variables. 
+  This dataset is selected because of its recentness and the fact that the happiness score is based on the individual respondent's judgment on their own feeling of happiness, making the data more meaningful in terms of our purpose as we are curious about factors that impact how happy individuals are. As well, the dataset takes into account 153 countries that vary largely in the variables included in the report, which can potentially provide clearer relationships between the variables. 
   
 There are some drawbacks in the data collection process. First, having the surveys conducted through phone calls being the major method has a high chance of being ignored and rejected. This makes the respondents less representative of the entire population. As well, since the survey has to be translated into multiple languages for respondents in different countries, translation and interpretation errors can potentially exist.
 
+\newpage
 
 ## Model
-  ***** add linear reg because the response var is numerical *****
-  A multiple linear regression model is used to investigate correlation between *Happiness Score*, the response variable, and other 4 explanatory variables. As mentioned in the introduction, it is a model that predicts the relationship between the response variable and multiple explanatory variables. The 4 variables in the model are: *GDP per capita*, *Social Support*, *Healthy life expectancy*, *Freedom to make life choices*, *Perceptions of corruption*, and *Region*. *Region* is a dummy variable, meaning that it is a categorical variable in the regression model, while the rest of the 5 explanatory variables are numerical variables. 
-  A linear regression model is used because the relationships between *Happiness Score* and the explanatory variables are believed to be linear, where they are either positive, negative, or they have no relationship. ***** The selection of these 4 explanatory variables based on the idea of how they are the important social and environmental factors provided in the dataset that can impact the quality of life.***** (explain why each is chosen) Although *Generosity* is included in the dataset, it is not considered in our regression model because we believe that there is not a direct relationship between *Happiness Score* and *Generosity*. However, we will further investigate the effect of *Generosity* on *Happiness Score* with the approach of an instrumental variable.
+  A multiple linear regression model is used to investigate correlation between *Happiness Score*, the response variable, and other 3 explanatory variables. As mentioned in the introduction, it is a model that predicts the relationship between the response variable and multiple explanatory variables. The 3 variables in the model are: *GDP per capita*, *Social Support*, and *Freedom to make life choices*, and they are all numerical variables. The variable *Region* was first used to stratify the data as the survey samples were collected through a geographical stratification method. The multiple linear regression model was then created in R-studio. Although *Generosity* is included in the data, it is believed to have no direct affect on *Happiness Score*. However, further examination on its indirect impact through *Social Support* on *Happiness Score* will be done with the approach of an instrumental variable in the later sections. 
 
-*** mention software that was used to run the model ***
-
-*** discuss samplng and survey aspects assert in the modelling decisions i made - might have to do stratification on region****
 ### Formula of the Model:
-$y = -0.254 + 0.24X_1 + 2.111X_2 + 2.459X_3 - 0.337X_4 - 0.197X_5 + 0.148X_6 - 0.282X_7 + 0.652X_8 - 0.722X_9 - 0.598X_10 - 0.472X_11 + 0.554X_12$
+
+\begin{center}
+  
+$y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3$
+
+[Equation 1]
+
+\end{center}  
 
 
-***** explain the X_i values and what do beta values represent and wat y is ****
+
+Where:
+
+$y =$ *Happiness Score* - our response variable.
+
+$X_1$ = *GDP per capita*
+
+$X_2$ = *Social Support*
+
+$X_3$ = *Freedom to make life choices*
+
+$\beta_0$ = intercept of the model
+
+$\beta_1$ = the parameter for the variable *GDP per capita*
+
+$\beta_2$ = the parameter for the variable *Social Support*
+
+$\beta_3$ = the parameter for the variable *Freedom to make life choices*
+
+&nbsp;
+
+A multiple linear regression model is chosen because the response variable *Happiness* is a numerical variable and the relationships between *Happiness Score* and the explanatory variables are believed to be linear, where they are either positive, negative, or they have no relationship. The selection of these 3 explanatory variables based on the idea of how they are the important social factors provided in the dataset that can impact individuals’ perception of happiness. *GDP per capita* represents the country’s economy, which can be used to infer the quality of life in the country. *Social Support* can be helpful in understanding the citizens’ general thoughts toward their communities that could potentially influence their personal feelings. Lastly, *Freedom to make life choices* is a significant factor as being able to make our own decisions is critical and it can determine how satisfied people are with their lives. 
+ 	
+\newpage
+
+# Results
+
+## Distributions of each explanatory variables against *Happiness Score*
 
 ```{r, echo=FALSE}
-model <- lm(`Happiness Score` ~ `GDP per capita` + `Social support` + `Freedom to make life choices` + as.factor(Region), happiness_dat)
+graph1 <- happiness_dat %>%
+  ggplot(aes(x = `GDP per capita`, y = `Happiness Score`)) +
+  geom_point() +
+  labs(title = "Scatter Plot of GDP per capita by Happiness Score",
+       caption = "Figure 6 - Scatter Plot of GDP per capita by Happiness Score",
+       x = "GDP per capita",
+       y = "Happiness Score")
+graph1
+```
 
-kable(summary(model)$coefficients, caption = "Table of the Beta Values of the Model", digits = 4)
+Figure 6 shows the distribution of *GDP per capita* against *Happiness Score*. The observations are not too spread out as an obvious increasing trend is still visible as *GDP per capita* increases, which can be interpreted as a positive linear relationship between the two. *GDP per capita* ranges from around 6 to 11.5 while *Happiness Score* ranges between 2.5 and 8. There is not any significant outlier and there is no clear smaller cluster as well.
+
+```{r, echo=FALSE}
+graph2 <- happiness_dat %>%
+  ggplot(aes(x = `Social support`, y = `Happiness Score`)) +
+  geom_point() +
+  labs(title = "Scatter Plot of Social Support by Happiness Score",
+       caption = "Figure 7 - Scatter Plot of Social Support by Happiness Score",
+       x = "Social Support",
+       y = "Happiness Score")
+graph2
+```
+
+The scatter plot of *Social support* by *Happiness Score* (figure 7) displays a positive linear relationship between the two variables. Most of the observations lie within the range from 0.6 to 1.0 for *Social Support*, indicating that the majority of the countries around the world tend to have higher social support. There is a significant outlier that lies around 0.3 for *Social Support*, with a few less significant ones close to 0.5. 
+
+```{r, echo=FALSE}
+graph3 <- happiness_dat %>%
+  ggplot(aes(x = `Freedom to make life choices`, y = `Happiness Score`)) +
+  geom_point() +
+  labs(title = "Scatter Plot of Freedom to Make Life Choices by Happiness Score",
+       caption = "Figure 8 - Scatter Plot of Freedom to Make Life Choices by Happiness Score",
+       x = "Freedom to Make Life Choices",
+       y = "Happiness Score")
+graph3
+```
+
+While the observations seem to be fairly spread out in figure 8, a positive linear relationship between *Freedom to Make Life Choices* and *Happiness Score* can still be noticed. Most observations lie between 0.6 to 1.0 for *Freedom to Make Life Choices*, meaning that most countries have relatively high degree of freedom for citizens to make their own life decisions. Two outliers can be observed on the lower left corner of the plot. 
+
+## Resulting Summary of the Model
+
+```{r, include=FALSE}
+design = svydesign(id=~1, strata = ~Region, data=happiness_dat)
+
+model <- svyglm(`Happiness Score` ~ `GDP per capita` + `Social support` + `Freedom to make life choices`, design)
+```
+
+```{r, echo=FALSE}
+kable(summary(model)$coefficients, caption = "Summary of the Model", digits = 4)
+```
+
+Table 3 displayed above is the summary table of the Multiple Linear Regression Model on *Happiness Score* with 3 regressors (*GDP per capita*, *Social Support*, and *Freedom to make life choices*). 
+
+The resulting formula of our model is then:
+
+\begin{center}
+$y = -2.4156 + 0.3938 X_1 + 2.7917 X_2 + 2.5152 X_3 $
+
+[Equation 2]
+
+\end{center}
+
+## R-squared
+
+```{r, include=FALSE}
+rsq(model)
+```
+The computed R-squared value is 0.7203.
+
+## The Instrumental Variable Approach
+
+```{r, echo=FALSE}
+
+ivsum <- iv_robust(`Happiness Score` ~ `Social support` | `Generosity` , data = happiness_dat) %>% 
+  summary()
+
+kable(ivsum$coefficients, caption = "Summary of the Instumental Variable Approach (Instrumental Variable:*Generosity* ; Treatment Variable: *Social Support*)")
+
+
 ```
 
 
-# Results
-[relay any tables and graphs that are a result of some intended statistical analysis, should include text describing the results of these tables and figures.]
-[additional analysis results should be included here]
-[be concise]
-[should say: we estimate that the ... to be (number). this is based off our ... analysis of ... modelled by a <type of model>, which accounted for <list of variables in the model>.]
 
 # Discussion
-### Summary
-[tie everything together ~ 1 paragraph]
+## Summary
+
+In summary, we used the 2020 WHR data set to perform a statistical analysis on *Happiness Score* (the national average score given by individuals of a country that indicates their level of happiness) with a Multiple Linear Regression Model. The 2020 WHR dataset was constructed with the assistance of a world-wide survey called the Gallup World Polls and the World Bank. Our model estimates the *Happiness Score* of a country with the explanatory variables: *GDP per capita* (indicator of the health of the economy of a country), *Social Support* (national average level of how supportive individual thinks people around them are), and *Freedom to make life choices* (national average degree of freedom citizens of a country think they possess for making their own life decisions), in order to discover the impacts of these social factors on how happy individuals perceive themselves to be. After that, an approach of an instrumental variable was applied to find out whether a hidden relationship between *Generosity* (national average generosity of individuals) and *Happiness Score* exists. 
 
 ## Conclusions
-[explain the results and identify any relevant findings - touch on global impacts ~ 2 paragraphs]
-[ex) The propensity score analysis showed that people who smoked were 2.465 (p-value = 0.002) times more likely to develop lung cancer than people who did not smoke. Based off this result it appears as though smoking at least 1 pack of cigarettes per day for a prolonged period of time will increase one’s likelihood of developing lung cancer by approximately 250%.]
+
+### Interpretation of the Resulting the Formula
+
+With the formula of our model being:
+\begin{center}
+$y = -2.4156 + 0.3938 X_1 + 2.7917 X_2 + 2.5152 X_3 $
+
+[Equation 2]
+
+\end{center}
+
+We can infer that:
+
++ The intercept of our model is -2.4156, representing that when *GDP per capita* = 0, *Social Support* = 0, and *Freedom to make life choices* = 0, the estimated *Happiness Score* is -2.4156.
+
++ When there is a unit increase in *GDP per capita*, *Happiness Score* increases by 0.3938 units.
+
++ Every unit increase in *Social Support* increases the *Happiness Score* by 2.7917 units.
+
++ As *Freedom to make life choices* increases by a unit, *Happiness Score* increases by 2.5152 units.
+
+### Evaluation of the Model
+
++ $R^2 = 0.7203$ - this means that 72.03% of the variation in *Happiness Score* can be explained by our model.
++ P-values of the explanatory variables in the model are all below 0.05, therefore they are all statistically significant.
+
+The above implies that our model is a good fit for estimating *Happiness Score*.
+
+
+### Interpretation of the Instrumental Variable Approach
+
+Table 4 is the summary table of our Instrumental Variable Approach with *Generosity* being the instrumental variable. Instrumental Variable is an approach for determining hidden relationships between seemingly unrelated variables. It is used when there exists a relationship between an instrumental variable that has no causation on the response variable, and a treatment variable that is believed to have a direct relationship with the response variable. We applied this approach in our analysis because there seems to be a relationship between *Generosity* and *Social support*. We believe that how generous an individual is can be influenced by how supportive people around them are. We also think that there is no direct relationship between *Generosity* and *Happiness Score* since it is a personality trait that benefits others instead of the individual themselves. As well, from our regression model we know that there is a direct relationship between *Social Support* and *Happiness Score*.
+
+According to the result of our approach, we discovered an indirect impact of *Generosity* on *Happiness Score* through *Social Support*. The estimate is -11.136. This shows that, every unit increased in *Generosity* leads to a decrease of 11.136 units in *Happiness Score*, so the more generous people are, the less happy they feel. 
+
+This result was not the expected relationship between the two aspects as *Generosity* is usually viewed as a positive personality trait. It is worth looking deeper into the meanings behind this interesting result, but we will not further discuss it in this report. 
+
+### Final Conclusion
+To conclude our findings, all of the three explanatory variables (*GDP per capita*, *Social Support*, and *Freedom to make life choices*) appeared to have positive linear relationships with *Happiness Score*: The higher the GDP of the country is (better economy), the happier the citizens of the country are; the more social support individuals in average get from people around them, the happier they are; and the more freedom individuals possess on making their own life decisions, they happier they tend to be. Furthermore, according to our approach of an instrumental variable, we found that the more generous people are, the less happy they seem.
+
+Our model and findings can be used as a reference for governments or organizations that would like to create more ideal living environments for their communities and people. They can consider improving the quality of life by making positive changes economically and socially, and reflecting on the human rights and freedoms their people have, to make those they care about happier. 
+
 
 ## Weakness & Next Steps
-[address weakness of the analysis]
-[address future steps of the analysis - how to improve it (can refer to weaknesses)]
+
+Drawbacks in the survey and data collection process has already been mentioned in the data section. A major weakness of our model to the dataset would be the sensitivity of linear regression models to outliers. As we can see in the previous sections, outliers do exist in the dataset. Their presence could have potentially impacted the accuracy of our results. With our approach of instrumental variable, we noticed that hidden effects on *Happiness Score* from other social factors do exist. These hidden relationships probably created effects on the relationships between other variables and *Happiness Score*. 
+
+One further improvement on our model would be to apply a finite population correction in order to strengthen the model and make it more meaningful and suitable. Since the 2020 WHR dataset is the only data being used to model the relationships, another further step would be to also include data from previous years to obtain more accurate correlations between the response variable and the explanatory variables. Last but not least, more social factors could be considered to investigate more exact impacts of our explanatory variables in the model on *Happiness Score*, but this is very difficult because it requires more effort to decide what factors are significant and to collect data on them from all around the world. 
+
 
 # References
 ## DataSet
@@ -177,6 +323,25 @@ Helliwell, John F., Richard Layard, Jeffrey Sachs, and Jan-Emmanuel De Neve, eds
   World Happiness Report 2020. New York: Sustainable Development Solutions Network
   
 ## Packages
+
+Alboukadel Kassambara (2020). ggpubr: 'ggplot2' Based Publication Ready Plots. R package version 0.4.0.
+  https://CRAN.R-project.org/package=ggpubr
+  
+Dabao Zhang (2020). rsq: R-Squared and Related Measures. R package version 2.0. https://CRAN.R-project.org/package=rsq
+
+Graeme Blair, Jasper Cooper, Alexander Coppock, Macartan Humphreys and Luke Sonnet (2020). estimatr: Fast Estimators for Design-Based
+  Inference. R package version 0.28.0. https://CRAN.R-project.org/package=estimatr
+
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+
+Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2020). dplyr: A Grammar of Data Manipulation. R package version 1.0.2.
+  https://CRAN.R-project.org/package=dplyr
+
+T. Lumley (2020) "survey: analysis of complex survey samples". R package version 4.0.
+
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
+
+Yihui Xie (2020). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version 1.29.
 
 ## Software 
 RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC,
