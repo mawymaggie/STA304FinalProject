@@ -25,9 +25,7 @@ happiness_dat <- happiness_raw %>%
   select(`Ladder score`,
          `Logged GDP per capita`,
          `Social support`,
-         `Healthy life expectancy`,
          `Freedom to make life choices`,
-         `Perceptions of corruption`,
          `Regional indicator`,
          Generosity)
 happiness_dat <- happiness_dat %>%
@@ -41,7 +39,8 @@ happiness_dat <- happiness_dat %>%
 Code and data supporting this analysis is available at: https://github.com/mawymaggie/STA304FinalProject.git 
 
 # Abstract
-##### a brief summary of the entire report (one paragraph)
+
+Our world is made up of over 7 billions unique individuals. One of the most unique components of us is our feelings, and they are determined by our surroundings. This report aims to investigate the impacts of several social factors on the *Happiness* of individuals using data obtained from the 2020 World Happiness Report. A statistical analysis using a Multiple Linear Regression Model is performed on the dataset to achieve the goal of the investigation. Evidence on positive impacts of *GDP per capita*, *Social Support*, and *Freedom to Make Life Choices* on the average *Happiness Score* individuals in each participating country give to themselves..........
 
 # Keywords
 World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical Analysis, Relationships, Survey, Instrumental Variable, Treatment, Estimation
@@ -50,7 +49,7 @@ World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical
 # Introduction
   How happy are people around the world? The World Happiness Report (WHR) ranks countries according to the happiness scores their citizens give to themselves. This happiness score is a subjective score on how happy each individual perceives themselves to be, and is collected through a survey called the Gallup World Poll (Helliwell, 2020). This report seems to show that how happy a person is could be dependent on some environmental and social factors that vary from country to country.
 
-  So, what are the factors that determine the level of happiness of the citizens of a country? In this report, a multiple linear regression model will be performed on the 2020 World Happiness Report dataset to predict Happiness Scores with various explanatory variables. A multiple linear regression model (MLR) is a statistical technique that is used to investigate linear relationships between a numerical outcome variable and multiple predictor variables. It models the relationship by using the predictor variables to estimate the values of the outcome variable (Kenton, 2020). Therefore with MLR, a statistical analysis can be done to find out how those factors included in the model, such as the GDP per capita, healthy life expectancy, affect the happiness score of a country. Then by considering these findings of the analysis, we can identify the qualities of a more ideal living environment and hence, changes can possibly be made to create a "Happier" world.
+  So, what are the factors that determine the level of happiness of the citizens of a country? In this report, a multiple linear regression model will be performed on the 2020 World Happiness Report dataset to predict Happiness Scores with various explanatory variables. A multiple linear regression model (MLR) is a statistical technique that is used to investigate linear relationships between a numerical outcome variable and multiple predictor variables. It models the relationship by using the predictor variables to estimate the values of the outcome variable (Kenton, 2020). Therefore with MLR, a statistical analysis can be done to find out how those factors included in the model, such as the GDP per capita and social support, affect the happiness score of a country. Then by considering these findings of the analysis, we can identify the qualities of a more ideal living environment and hence, changes can possibly be made to create a "Happier" world.
 
   In the following sections, a thorough analysis will be performed to examine the relationships between Happiness Score and some potential factors that affect it. In the Methodology section (Section 2), the 2020 World Happiness Report dataset is first introduced, followed by the details of the multiple linear regression model and the additional approach of an instrumental variable to look into the indirect effect of this extra variable on Happiness Scores. The results of the above methodology can then be found in the Results Section (Section 3). Last but not least, the Conclusion Section (Section 4) covers the explanations and implications of the results, and the report finishes with a Reference Section (Section 5) including the references of the sources used in the report.
 
@@ -58,14 +57,15 @@ World Happiness Report, Happiness Score, Multiple Linear Regression, Statistical
 # Methodology
 ## Data
 
-  This report relies on the 2020 World Happiness Report (WHR) dataset. The WHR is an annual report started in 2012 that ranks countries according to how happy their citizens perceive themselves to be in order to “review the science of measuring and understanding subjective well-being, and to use survey measures of life satisfaction to track the quality of lives” (Helliwell, 2020).
+  This report relies on the 2020 World Happiness Report (WHR) dataset. The WHR is an annual report started in 2012 that ranks countries according to how happy their citizens perceive themselves to be in order to “review the science of measuring and understanding subjective well-being, and to use survey measures of life satisfaction to track the quality of lives” (Helliwell, 2020). 
 
 * Here is a table of the first few rows of the Happiness Dataset:
 ```{r, echo = FALSE}
-kable(head(happiness_dat), caption = "Example of the Happiness Dataset", digits = 2)
+kable(head(happiness_dat), caption = "Example of the Happiness Dataset", digits = 4)
 ```
 
-  There are 153 observations representing the 153 countries and 20 columns in the dataset, but only the following 8 columns are necessary to be considered in the analysis of this report:
+  The population of the WHR is all of the countries around the world, where the frame of the study is the 193 countries that are members of the United Nation and the 2 countries with permanent observer states that are non-members. The sampled population is the 153 countries included in the dataset. Thus, there are 153 observations representing the 153 countries and 20 columns in the dataset, but only the following 6 columns that represent important social factors are necessary to be considered in the analysis of this report:
+
 
 1. _**Happiness Score**_: the average score individuals of the corresponding country gave to themselves indicating how happy they think they are. 
 
@@ -73,17 +73,13 @@ kable(head(happiness_dat), caption = "Example of the Happiness Dataset", digits 
 
 3. _**Social Support**_: national average value of binary responses of 0 = No and 1 = Yes to the question asking whether the respondent has relatives or friends they can count on to help them with their needs.
 
-4. _**Healthy life  expectancy**_: national average of age indicating the healthy life expectancy determined at birth.
+4.  _**Freedom to make life choices**_: national average of binary responses to the question asking whether the respondent is satisfied with their freedom to make life choices.
 
-5. _**Freedom to make life choices**_: national average of binary responses to the question asking whether the respondent is satisfied with their freedom to make life choices.
+5. _**Region**_: the corresponding region of the country
 
-6. _**Perceptions of corruption**_: national average of binary responses to two questions asking whether the respondent thinks corruption is widespread throughout the government and within businesses or not, with responses on business corruption being the main measure. 
+6. _**Generosity**_: the residual of regressing the national average of responses to the question asking whether the respondent had donated money to a charity in the past month on *GDP per capita*. 
 
-7. _**Region**_: the corresponding region of the country
-
-8. _**Generosity**_: the residual of regressing the national average of responses to the question asking whether the respondent had donated money to a charity in the past month on *GDP per capita*. 
-
-  Some of the data is collected from the survey responses in the Gallup World Poll, which includes the *Happiness Score*,  *Social Support*, *Freedom to make life choices*, *Perceptions of corruption*, *Region*, and *Generosity*. The other parts of the data come from different government organizations according to the region the surveyed individual is from. *GDP per capita* is obtained from the World Development Indicators released by the World Bank.  
+  While *GDP per capita* is then obtained from the World Development Indicators released by the World Bank, the rest of the data is collected from the survey responses in the Gallup World Poll (*Happiness Score*,  *Social Support*, *Freedom to make life choices*, *Region*, and *Generosity*). The Gallup World Poll is a survey targeting the entire world population that covers a huge variety of topics. There are 160 countries and areas around the world included in their sample. The target population of the survey is the entire civilian, non-institutionalized, aged 15 and older population of the world (Gallup 2020). Gallup conducts the survey either by landline and cellular telephones in countries where telephone coverage represents at least 80% of the population and in the other countries, face-to-face interviews are used. Telephone interviews use either the nationally representative life of phone numbers or a computer system that generates random phone numbers with specified area codes. This means that the sample is selected through a stratified method that creates a frame population of all possible phone numbers with or without an owner for telephone interview sample; the frame of the face-to-face interviews is the area frame that is defined with land units. Then a sample of each country is selected randomly from the sampling frame with a size of around 500 to 2000 respondents. Those selected respondents of each of the 153 countries are then added together to make up the sampled population of the entire survey.  
 
 * The following graphs display the distributions of the *Happiness Score* and the explanatory variables in the Happiness Dataset:
 
@@ -111,46 +107,50 @@ g3<-happiness_dat %>%
        x = "Social support")
 
 g4<-happiness_dat %>%
-  ggplot(aes(x= `Healthy life expectancy`)) +
-  geom_density() +
-  labs(title = "Healthy life expectancy",
-       caption = "Figure 4 - Density Graph of Healthy life expectancy",
-       x = "Healthy life expectancy")
-
-g5<-happiness_dat %>%
   ggplot(aes(x= `Freedom to make life choices`)) +
   geom_density() +
   labs(title = "Freedom to make life choices",
        caption = "Figure 5 - Density Graph of Freedom to make life choices",
        x = "Freedom to make life choices")
 
-g6<-happiness_dat %>%
-  ggplot(aes(x= `Perceptions of corruption`)) +
-  geom_density() +
-  labs(title = "Perceptions of corruption",
-       caption = "Figure 6 - Density Graph of Perceptions of corruption",
-       x = "Perceptions of corruption")
-
-g7<-table(happiness_dat$Region)
-g8<-happiness_dat %>%
+g5<-happiness_dat %>%
   ggplot(aes(x= Generosity)) +
   geom_density() +
   labs(title = "Generosity",
        caption = "Figure 7 - Density Graph of Generosity",
        x = "Generosity")
+g6<-table(happiness_dat$Region)
 
-ggarrange(g1, g2, g3, g4, ncol = 2, nrow = 2)
-ggarrange(g5, g6, g8, ncol = 2, nrow = 2)
+ggarrange(g1, g2, g3, g4, g5, ncol = 2, nrow = 3)
 
-kable(arrange(as.data.frame(g7), desc(Freq)),col.names = c("Region", "Count"), caption = "Distribution of Region")
+kable(arrange(as.data.frame(g6), desc(Freq)),col.names = c("Region", "Count"), caption = "Distribution of Region")
 
 ```
 
-  This dataset is selected because of its recentness and the fact that the happiness score is based on the individual respondent's judgment on their own level of happiness, making the data more meaningful in terms of our purpose as we are curious about factors that affect the happiness of individuals. As well, the dataset takes into account 153 countries that vary largely in the variables included in the report, which can potentially provide clearer relationships between the variables. 
+  This dataset is selected because of its recentness and the fact that the happiness score is based on the individual respondent's judgment on their own feeling of happiness, making the data more meaningful in terms of our purpose as we are curious about factors that affect the happiness of individuals. As well, the dataset takes into account 153 countries that vary largely in the variables included in the report, which can potentially provide clearer relationships between the variables. 
+  
+There are some drawbacks in the data collection process. First, having the surveys conducted through phone calls being the major method has a high chance of being ignored and rejected. This makes the respondents less representative of the entire population. As well, since the survey has to be translated into multiple languages for respondents in different countries, translation and interpretation errors can potentially exist.
+
 
 ## Model
-[write out the model and describe the parameters and variables included + justification for why this model was selected.]
-[include mathematical notation when explicitly stating the model, should describe the notation used]
+  ***** add linear reg because the response var is numerical *****
+  A multiple linear regression model is used to investigate correlation between *Happiness Score*, the response variable, and other 4 explanatory variables. As mentioned in the introduction, it is a model that predicts the relationship between the response variable and multiple explanatory variables. The 4 variables in the model are: *GDP per capita*, *Social Support*, *Healthy life expectancy*, *Freedom to make life choices*, *Perceptions of corruption*, and *Region*. *Region* is a dummy variable, meaning that it is a categorical variable in the regression model, while the rest of the 5 explanatory variables are numerical variables. 
+  A linear regression model is used because the relationships between *Happiness Score* and the explanatory variables are believed to be linear, where they are either positive, negative, or they have no relationship. ***** The selection of these 4 explanatory variables based on the idea of how they are the important social and environmental factors provided in the dataset that can impact the quality of life.***** (explain why each is chosen) Although *Generosity* is included in the dataset, it is not considered in our regression model because we believe that there is not a direct relationship between *Happiness Score* and *Generosity*. However, we will further investigate the effect of *Generosity* on *Happiness Score* with the approach of an instrumental variable.
+
+*** mention software that was used to run the model ***
+
+*** discuss samplng and survey aspects assert in the modelling decisions i made - might have to do stratification on region****
+### Formula of the Model:
+$y = -0.254 + 0.24X_1 + 2.111X_2 + 2.459X_3 - 0.337X_4 - 0.197X_5 + 0.148X_6 - 0.282X_7 + 0.652X_8 - 0.722X_9 - 0.598X_10 - 0.472X_11 + 0.554X_12$
+
+
+***** explain the X_i values and what do beta values represent and wat y is ****
+
+```{r, echo=FALSE}
+model <- lm(`Happiness Score` ~ `GDP per capita` + `Social support` + `Freedom to make life choices` + as.factor(Region), happiness_dat)
+
+kable(summary(model)$coefficients, caption = "Table of the Beta Values of the Model", digits = 4)
+```
 
 
 # Results
@@ -185,6 +185,9 @@ RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC,
 ## Websites
 Kenton, W. (2020, September 21). How Multiple Linear Regression Works. Retrieved December 02, 2020, 
   from  https://www.investopedia.com/terms/m/mlr.asp
+  
+Gallup, I. (2020, December 08). Global Research. Retrieved December 21, 2020, from 
+  https://www.gallup.com/analytics/318875/global-research.aspx
 
 
 
